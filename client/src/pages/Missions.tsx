@@ -56,7 +56,8 @@ const getMissions = async (
   {
     Missions(
       sort: {
-        field: ${sortField}
+        field: ${sortField},
+        desc: ${sortDesc}
       }
     ) {
       id
@@ -85,13 +86,14 @@ const Missions = (): JSX.Element => {
   const addMission = () => {
     const newMission = {title,operator}
     console.log(newMission);
-    fetch('http://localhost:3000/Missions',{
-      method:'POST',
-      headers:{"Content-Type": "application/json"}, 
-      body: JSON.stringify(newMission)
-    }).then(()=>{
-      console.log("added")
-    })
+    // fetch('http://localhost:3000/Missions',{
+    //   method:'POST',
+    //   headers:{"Content-Type": "application/json"}, 
+    //   body: JSON.stringify(newMission)
+    // }).then(()=>{
+    //   console.log("added")
+    // })
+    
   
   }
   const handleErrClose = (event?: SyntheticEvent | Event, reason?: string) => {
@@ -124,7 +126,7 @@ const Missions = (): JSX.Element => {
   
 
   useEffect(() => {
-    getMissions(sortField)
+    getMissions(sortField,sortDesc)
       .then((result: MissionsResponse) => {
         setMissions(result.data.Missions);
       })
@@ -132,7 +134,7 @@ const Missions = (): JSX.Element => {
         setErrMessage("Failed to load missions.");
         console.log(err);
       });
-  }, [sortField]);
+  }, [sortField,sortDesc]);
 
   return (
     <AppLayout title="Missions">
@@ -244,7 +246,7 @@ const Missions = (): JSX.Element => {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleNewMissionClose}>Cancel</Button>
-            <Button onClick={addMission}>Save</Button>
+            <Button onClick={handleNewMissionClose}>Save</Button>
           </DialogActions>
         </Dialog>
       </Container>
