@@ -40,7 +40,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { ListMenu } from "../components/ListMenu";
 
 type SortField = "Title" | "Date";
-type SortType = "True" | "False";
+
 interface MissionsResponse {
   data: {
     Missions: Mission[];
@@ -49,7 +49,6 @@ interface MissionsResponse {
 
 const getMissions = async (
   sortField: SortField,
-  sortType: SortType,
   sortDesc?: Boolean
 ): Promise<MissionsResponse> => {
   return await fetchGraphQL(
@@ -57,8 +56,7 @@ const getMissions = async (
   {
     Missions(
       sort: {
-        field: ${sortField},
-        desc:${sortType}
+        field: ${sortField}
       }
     ) {
       id
