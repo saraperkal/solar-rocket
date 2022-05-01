@@ -23,11 +23,17 @@ export const ListMissions = (missions: Mission[], args: any) => {
           a = "";
           b = "";
       }
+<<<<<<< HEAD
       
       if (args.sort?.desc !== false) {
         return a > b ? 1 : -1;
       } else {
+=======
+      if (args.sort?.desc === true) {
+>>>>>>> 37879de46030177e2931237f43027e7725b54f5d
         return a < b ? 1 : -1;
+      } else {
+        return a > b ? 1 : -1;        
       }
       
     });
