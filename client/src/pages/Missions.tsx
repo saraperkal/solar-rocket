@@ -32,6 +32,7 @@ import {
   Sort as SortIcon,
   ArrowDownward as ArrowDownwardIcon,
   ArrowUpward as ArrowUpwardIcon,
+  SettingsOutlined,
 } from "@mui/icons-material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -39,7 +40,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { ListMenu } from "../components/ListMenu";
 
 type SortField = "Title" | "Date";
-
+type SortType = "True" | "False";
 interface MissionsResponse {
   data: {
     Missions: Mission[];
@@ -48,6 +49,7 @@ interface MissionsResponse {
 
 const getMissions = async (
   sortField: SortField,
+  sortType: SortType,
   sortDesc?: Boolean
 ): Promise<MissionsResponse> => {
   return await fetchGraphQL(
@@ -55,7 +57,8 @@ const getMissions = async (
   {
     Missions(
       sort: {
-        field: ${sortField}
+        field: ${sortField},
+        desc:${sortType}
       }
     ) {
       id
@@ -78,7 +81,21 @@ const Missions = (): JSX.Element => {
   const [sortDesc, setSortDesc] = useState<boolean>(true);
   const [sortField, setSortField] = useState<SortField>("Title");
   const [errMessage, setErrMessage] = useState<String | null>(null);
-
+  const [title, setTitle] = useState('');
+  const [operator, setOperator] = useState<String | null>(null);
+  // const [errMessage, setErrMessage] = useState<String | null>(null);
+  const addMission = () => {
+    const newMission = {title,operator}
+    console.log(newMission);
+    fetch('http://localhost:3000/Missions',{
+      method:'POST',
+      headers:{"Content-Type": "application/json"}, 
+      body: JSON.stringify(newMission)
+    }).then(()=>{
+      console.log("added")
+    })
+  
+  }
   const handleErrClose = (event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") return;
     setErrMessage(null);
@@ -102,7 +119,11 @@ const Missions = (): JSX.Element => {
   };
   const handleSortDescClick = () => {
     setSortDesc(!sortDesc);
+   
   };
+  
+  
+  
 
   useEffect(() => {
     getMissions(sortField)
@@ -128,10 +149,11 @@ const Missions = (): JSX.Element => {
               <FilterAltIcon />
             </IconButton>
             <ListMenu
-              options={["Date", "Title"]}
+              options={["Date", "Title","Operator"]}
               endIcon={<SortIcon />}
               onSelectionChange={handleSortFieldChange}
             />
+            
             <IconButton onClick={handleSortDescClick}>
               {sortDesc ? <ArrowDownwardIcon /> : <ArrowUpwardIcon />}
             </IconButton>
@@ -180,6 +202,7 @@ const Missions = (): JSX.Element => {
           fullWidth
           maxWidth="sm"
         >
+          
           <DialogTitle>New Mission</DialogTitle>
           <DialogContent>
             <Grid container direction="column" spacing={2}>
@@ -187,16 +210,19 @@ const Missions = (): JSX.Element => {
                 <TextField
                   autoFocus
                   id="name"
-                  label="Name"
+                  label="Title"
+                  onChange={(e)=> setTitle(e.target.value)}
                   variant="standard"
                   fullWidth
                 />
+                
               </Grid>
               <Grid item>
                 <TextField
                   autoFocus
                   id="desc"
-                  label="Description"
+                  label="Operator"
+                  onChange={(e)=> setOperator(e.target.value)}
                   variant="standard"
                   fullWidth
                 />
@@ -220,7 +246,7 @@ const Missions = (): JSX.Element => {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleNewMissionClose}>Cancel</Button>
-            <Button onClick={handleNewMissionClose}>Save</Button>
+            <Button onClick={addMission}>Save</Button>
           </DialogActions>
         </Dialog>
       </Container>
