@@ -72,18 +72,62 @@ const getMissions = async (
     { sortField: sortField, sortDesc: sortDesc }
   );
 };
+const deleteMissions = async (
+  id:String
+):Promise<MissionsResponse> => {
+  return await fetchGraphQL(
+    `
+    mutation ($id:ID!){
+      deleteMission(id:$id){ 
+          id
+          title
+          operator
+          launch {
+            date
+          }
+        }  
+      }
+      `,
+    { id: id }
+  );
+};
 const addMission = async (
   title: String,
   operator: String,
-  tempLaunchDate:Date
+  date:Date ,
+  vehicle:String,
+  locationName:String,
+  locationLongitude:Number,
+  locationLatitude:Number,
+  orbidPeriapsis:Number,
+  orbidApoapsis:Number,
+  orbitInclination:Number,
+  payloadCapacity:Number,
+  payloadAvailablity:Number
+
 ): Promise<MissionsResponse> => {
   return await fetchGraphQL(
     `
-    mutation newMission($title: String!, $operator:String!, $tempLaunchDate:DateTime!){
+    mutation create(
+      $title: String!,
+      $operator: String!,
+      $date:DateTime! ,
+      $vehicle:String!,
+      $locationName:String!,
+      $locationLongitude:Float!,
+      $locationLatitude:Float!,
+      $orbidPeriapsis:Int!,
+      $orbidApoapsis:Int!,
+      $orbitInclination:Int!,
+      $payloadCapacity:Int!,
+      $payloadAvailablity:Int!){
       createMission(mission: {
         title: $title, 
         operator: $operator,
-        launch: {date:$tempLaunchDate,vehicle:"",location:{name:"",longitude:-120.613,latitude:-34.633}},orbit:{periapsis:222,apoapsis:111,inclination:111},payload:{capacity:444,available:666}}){
+        launch: {date: $date,vehicle: $vehicle,location: {name: $locationName,longitude: $locationLongitude,latitude: $locationLatitude}},
+        orbit:{periapsis:$orbidPeriapsis,apoapsis:$orbidApoapsis,inclination:$orbitInclination},
+        payload:{capacity:$payloadCapacity,available:$payloadAvailablity}
+      }){
         id
         title
         operator
@@ -91,30 +135,40 @@ const addMission = async (
           date
         }
       }
-    }
+  }
   `,
-    { title: title, operator: operator,tempLaunchDate:tempLaunchDate }
+    { title: title, operator: operator,date:date,vehicle:vehicle,locationName:locationName,locationLongitude:locationLongitude,locationLatitude,
+      orbidPeriapsis:orbidPeriapsis,orbidApoapsis:orbidApoapsis,orbitInclination:orbitInclination,
+      payloadCapacity:payloadCapacity,payloadAvailablity:payloadAvailablity}
   );
   
 };
-// "tempLaunchDate": "2022-12-26T09:32:40.000Z"
-// launch: {date:$tempLaunchDate,vehicle:"",location:{name:"",longitude:-120.613,latitude:-34.633}},orbit:{periapsis:222,apoapsis:111,inclination:111},payload:{capacity:444,available:666}}){
+
 
 const Missions = (): JSX.Element => {
   const [missions, setMissions] = useState<Mission[] | null>(null);
   const [newMissionOpen, setNewMissionOpen] = useState(false);
-  const [tempLaunchDate, setTempLaunchDate] = useState<Date | null>(null);
-  const [date, setDate] = useState<Date>();
+  const [tempLaunchDate, setTempLaunchDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<Date | null>(null);
   const [sortDesc, setSortDesc] = useState<boolean>(false);
   const [sortField, setSortField] = useState<SortField>("Title");
   const [errMessage, setErrMessage] = useState<String | null>(null);
   const [title, setTitle] = useState<String>("");
   const [operator, setOperator] = useState<String>("");
-  
+  const [vehicle, setVehicle] = useState<String>("");
+  const [locationName, setLocationName] = useState<String>("");
+  const [locationLongitude, setLocationLongitude] = useState<Number>(0);
+  const [locationLatitude, setLocationLatitude] = useState<Number>(0); 
+  const [orbidPeriapsis, setOrbidPeriapsis] = useState<Number>(0);
+  const [orbidApoapsis, setOrbidApoapsis] = useState<Number>(0);
+  const [orbitInclination, setOrbitInclination] = useState<Number>(0);
+  const [payloadCapacity, setPayloadCapacity] = useState<Number>(0);
+  const [payloadAvailablity, setPayloadAvailablity] = useState<Number>(0);
+
 
 
   const newMission = async () => {
-   await addMission(title, operator,tempLaunchDate);
+   await addMission(title, operator,tempLaunchDate,vehicle,locationName,locationLongitude ,locationLatitude,orbidPeriapsis,orbidApoapsis,orbitInclination,payloadCapacity,payloadAvailablity);
    setNewMissionOpen(false);
     try {
       setMissions((await getMissions(sortField,sortDesc)).data.Missions);
@@ -123,6 +177,15 @@ const Missions = (): JSX.Element => {
         console.log(error);
     }
   };
+  // const deleteMissions = async (id:String) => {
+  //   await deleteMission(id);
+  //    try {
+  //      setMissions((await getMissions(sortField,sortDesc)).data.Missions);
+  //    } catch (error) {
+  //      setErrMessage("Failed to load missions.");
+  //        console.log(error);
+  //    }
+  //  };
     
   const handleErrClose = (event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") return;
@@ -130,7 +193,7 @@ const Missions = (): JSX.Element => {
   };
 
   const handleNewMissionOpen = () => {
-    setTempLaunchDate(null);
+    setTempLaunchDate(new Date());
     setNewMissionOpen(true);
   };
 
@@ -138,9 +201,8 @@ const Missions = (): JSX.Element => {
     setNewMissionOpen(false);
   };
 
-  const handleTempLaunchDateChange = (newValue: Date | null) => {
+  const handleTempLaunchDateChange = (newValue: Date) => {
     setTempLaunchDate(newValue);
-   
   };
 
   const handleSortFieldChange = (event: SyntheticEvent, value: SortField) => {
@@ -202,7 +264,7 @@ const Missions = (): JSX.Element => {
                   </CardContent>
                   <CardActions>
                     <Button>Edit</Button>
-                    <Button>Delete</Button>
+                    <Button onClick={(e)=> deleteMissions(missions.id)}>Delete</Button>
                   </CardActions>
                 </Card>
               </Grid>
@@ -267,6 +329,102 @@ const Missions = (): JSX.Element => {
                     )}
                   />
                 </LocalizationProvider>
+              </Grid>
+              <Grid item>
+                <TextField
+                  autoFocus
+                  id="desc"
+                  label="vehicle"
+                  onChange={(e) => setVehicle(e.target.value)}
+                  variant="standard"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  autoFocus
+                  id="desc"
+                  label="LocationName"
+                  onChange={(e) => setLocationName(e.target.value)}
+                  variant="standard"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  autoFocus
+                  id="desc"
+                  type="number"
+                  label="LocationLongitude"
+                  onChange={(e) => setLocationLongitude(parseInt(e.target.value) )}
+                  variant="standard"
+                  fullWidth
+                />
+              </Grid><Grid item>
+                
+                <TextField
+                  autoFocus
+                  id="desc"
+                  type="number"
+                  label="LocationLatitude"
+                  onChange={(e) => setLocationLatitude(parseInt(e.target.value))}
+                  variant="standard"
+                  fullWidth
+                />
+              </Grid><Grid item>
+                <TextField
+                  autoFocus
+                  id="desc"
+                  type="number"
+                  label="OrbidPeriapsis"
+                  onChange={(e) => setOrbidPeriapsis(parseInt(e.target.value))}
+                  variant="standard"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  autoFocus
+                  id="desc"
+                  type="number"
+                  label="OrbidApoapsis"
+                  onChange={(e) => setOrbidApoapsis(parseInt(e.target.value))}
+                  variant="standard"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  autoFocus
+                  id="desc"
+                  type="number"
+                  label="OrbitInclination"
+                  onChange={(e) => setOrbitInclination(parseInt(e.target.value))}
+                  variant="standard"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  autoFocus
+                  id="desc"
+                  type="number"
+                  label="PayloadCapacity"
+                  onChange={(e) => setPayloadCapacity(parseInt(e.target.value))}
+                  variant="standard"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  autoFocus
+                  id="desc"
+                  type="number"
+                  label="vehiPayloadAvailablitycle"
+                  onChange={(e) => setPayloadAvailablity(parseInt(e.target.value))}
+                  variant="standard"
+                  fullWidth
+                />
               </Grid>
             </Grid>
           </DialogContent>

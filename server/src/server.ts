@@ -81,7 +81,6 @@ const main = async () => {
       Mutation: {
         async createMission(obj, args) {
           const missions = await loadMissions();
-
           const mission = CreateMission(args.mission);
           missions.push(mission);
 
@@ -92,6 +91,22 @@ const main = async () => {
           );
           return mission;
         },
+        async deleteMission(obj, args) {
+          console.log("I got here");
+
+          const missions = await loadMissions();
+          console.log("before change",missions);
+          const mission = await GetMissionById(missions, args.id);
+          missions.filter((m) => m !== mission)
+          console.log(missions);
+          await writeFile(
+            path.join(DATA_DIR, DATA_FILE_MISSIONS),
+            JSON.stringify(missions),
+            "utf8"
+          );
+          return mission;
+        },
+      
       },
     },
   });
