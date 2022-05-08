@@ -83,7 +83,6 @@ const main = async () => {
           const missions = await loadMissions();
           const mission = CreateMission(args.mission);
           missions.push(mission);
-
           await writeFile(
             path.join(DATA_DIR, DATA_FILE_MISSIONS),
             JSON.stringify(missions),
@@ -92,13 +91,9 @@ const main = async () => {
           return mission;
         },
         async deleteMission(obj, args) {
-          console.log("I got here");
-
           const missions = await loadMissions();
-          console.log("before change",missions);
           const mission = await GetMissionById(missions, args.id);
           missions.filter((m) => m !== mission)
-          console.log(missions);
           await writeFile(
             path.join(DATA_DIR, DATA_FILE_MISSIONS),
             JSON.stringify(missions),
