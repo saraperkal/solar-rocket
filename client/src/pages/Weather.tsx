@@ -41,7 +41,7 @@ const Weather = (): JSX.Element => {
       <Grid container >    
         {content.map((index: any) => {
           return (           
-              <Card sx={{ width: 1200, height: 500 ,alignSelf:"center"}}>
+              <Card sx={{ alignSelf:"center",width: 1200, height: 500 }}>
               <CardHeader title="Israel"  sx={{backgroundColor:"#e0e0e0"}}/>
               <CardHeader title={index.date}  />
                 <TableContainer component={Paper}>
@@ -59,7 +59,7 @@ const Weather = (): JSX.Element => {
                           return <TableCell>{hour.time.slice(10)}</TableCell>;
                         })}
                       </TableRow>
-                      
+
                       <TableRow sx={{backgroundColor:"#ffeb3b"}}>
                       <TableCell sx={{backgroundColor:"white"}}> <Typography variant="h6" >c°</Typography></TableCell>
                         {index.hour.map((hour: any) => {

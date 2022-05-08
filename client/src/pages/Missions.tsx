@@ -110,7 +110,7 @@ const addMission = async (
 ): Promise<MissionsResponse> => {
   return await fetchGraphQL(
     `
-    mutation create(
+    mutation(
       $title: String!,
       $operator: String!,
       $date:DateTime! ,
@@ -146,7 +146,7 @@ const addMission = async (
       vehicle: vehicle,
       locationName: locationName,
       locationLongitude: locationLongitude,
-      locationLatitude,
+      locationLatitude: locationLatitude,
       orbidPeriapsis: orbidPeriapsis,
       orbidApoapsis: orbidApoapsis,
       orbitInclination: orbitInclination,
@@ -159,8 +159,7 @@ const addMission = async (
 const Missions = (): JSX.Element => {
   const [missions, setMissions] = useState<Mission[] | null>(null);
   const [newMissionOpen, setNewMissionOpen] = useState(false);
-  const [tempLaunchDate, setTempLaunchDate] = useState<Date>(new Date());
-  const [date, setDate] = useState<Date | null>(null);
+  const [tempLaunchDate, setTempLaunchDate] = useState<Date | null>(null);
   const [sortDesc, setSortDesc] = useState<boolean>(false);
   const [sortField, setSortField] = useState<SortField>("Title");
   const [errMessage, setErrMessage] = useState<String | null>(null);
@@ -177,6 +176,8 @@ const Missions = (): JSX.Element => {
   const [payloadAvailablity, setPayloadAvailablity] = useState<Number>(0);
 
   const newMission = async () => {
+    if(tempLaunchDate)
+    {
     await addMission(
       title,
       operator,
@@ -191,6 +192,7 @@ const Missions = (): JSX.Element => {
       payloadCapacity,
       payloadAvailablity
     );
+    }
     setNewMissionOpen(false);
     try {
       setMissions((await getMissions(sortField, sortDesc)).data.Missions);
@@ -215,7 +217,7 @@ const Missions = (): JSX.Element => {
   };
 
   const handleNewMissionOpen = () => {
-    setTempLaunchDate(new Date());
+    setTempLaunchDate(null);
     setNewMissionOpen(true);
   };
 
@@ -223,7 +225,7 @@ const Missions = (): JSX.Element => {
     setNewMissionOpen(false);
   };
 
-  const handleTempLaunchDateChange = (newValue: Date) => {
+  const handleTempLaunchDateChange = (newValue: Date | null) => {
     setTempLaunchDate(newValue);
   };
 
@@ -345,7 +347,8 @@ const Missions = (): JSX.Element => {
                     minTime={new Date()}
                     label="Launch Date"
                     value={tempLaunchDate}
-                    onChange={(e) => handleTempLaunchDateChange}
+                    onChange={handleTempLaunchDateChange}
+                    onAccept={handleTempLaunchDateChange}
                     renderInput={(params) => (
                       <TextField variant="standard" {...params} />
                     )}
