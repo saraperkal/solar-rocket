@@ -1,6 +1,7 @@
 import { SyntheticEvent, useEffect, useState } from "react";
 import { AppLayout } from "../layouts/AppLayout";
 import fetchGraphQL from "../graphql/GraphQL";
+
 import { Mission } from "../graphql/schema";
 import {
   Card,
@@ -34,7 +35,11 @@ import {
   ArrowUpward as ArrowUpwardIcon,
   SettingsOutlined,
 } from "@mui/icons-material";
-import { DateTimePicker, DateTimePickerProps, LocalizationProvider } from "@mui/x-date-pickers";
+import {
+  DateTimePicker,
+  DateTimePickerProps,
+  LocalizationProvider,
+} from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 import { ListMenu } from "../components/ListMenu";
@@ -72,9 +77,7 @@ const getMissions = async (
     { sortField: sortField, sortDesc: sortDesc }
   );
 };
-const deleteMissions = async (
-  id:String
-):Promise<MissionsResponse> => {
+const deleteMissions = async (id: String): Promise<MissionsResponse> => {
   return await fetchGraphQL(
     `
     mutation ($id:ID!){
@@ -94,17 +97,16 @@ const deleteMissions = async (
 const addMission = async (
   title: String,
   operator: String,
-  date:Date ,
-  vehicle:String,
-  locationName:String,
-  locationLongitude:Number,
-  locationLatitude:Number,
-  orbidPeriapsis:Number,
-  orbidApoapsis:Number,
-  orbitInclination:Number,
-  payloadCapacity:Number,
-  payloadAvailablity:Number
-
+  date: Date,
+  vehicle: String,
+  locationName: String,
+  locationLongitude: Number,
+  locationLatitude: Number,
+  orbidPeriapsis: Number,
+  orbidApoapsis: Number,
+  orbitInclination: Number,
+  payloadCapacity: Number,
+  payloadAvailablity: Number
 ): Promise<MissionsResponse> => {
   return await fetchGraphQL(
     `
@@ -137,13 +139,22 @@ const addMission = async (
       }
   }
   `,
-    { title: title, operator: operator,date:date,vehicle:vehicle,locationName:locationName,locationLongitude:locationLongitude,locationLatitude,
-      orbidPeriapsis:orbidPeriapsis,orbidApoapsis:orbidApoapsis,orbitInclination:orbitInclination,
-      payloadCapacity:payloadCapacity,payloadAvailablity:payloadAvailablity}
+    {
+      title: title,
+      operator: operator,
+      date: date,
+      vehicle: vehicle,
+      locationName: locationName,
+      locationLongitude: locationLongitude,
+      locationLatitude,
+      orbidPeriapsis: orbidPeriapsis,
+      orbidApoapsis: orbidApoapsis,
+      orbitInclination: orbitInclination,
+      payloadCapacity: payloadCapacity,
+      payloadAvailablity: payloadAvailablity,
+    }
   );
-  
 };
-
 
 const Missions = (): JSX.Element => {
   const [missions, setMissions] = useState<Mission[] | null>(null);
@@ -158,23 +169,34 @@ const Missions = (): JSX.Element => {
   const [vehicle, setVehicle] = useState<String>("");
   const [locationName, setLocationName] = useState<String>("");
   const [locationLongitude, setLocationLongitude] = useState<Number>(0);
-  const [locationLatitude, setLocationLatitude] = useState<Number>(0); 
+  const [locationLatitude, setLocationLatitude] = useState<Number>(0);
   const [orbidPeriapsis, setOrbidPeriapsis] = useState<Number>(0);
   const [orbidApoapsis, setOrbidApoapsis] = useState<Number>(0);
   const [orbitInclination, setOrbitInclination] = useState<Number>(0);
   const [payloadCapacity, setPayloadCapacity] = useState<Number>(0);
   const [payloadAvailablity, setPayloadAvailablity] = useState<Number>(0);
 
-
-
   const newMission = async () => {
-   await addMission(title, operator,tempLaunchDate,vehicle,locationName,locationLongitude ,locationLatitude,orbidPeriapsis,orbidApoapsis,orbitInclination,payloadCapacity,payloadAvailablity);
-   setNewMissionOpen(false);
+    await addMission(
+      title,
+      operator,
+      tempLaunchDate,
+      vehicle,
+      locationName,
+      locationLongitude,
+      locationLatitude,
+      orbidPeriapsis,
+      orbidApoapsis,
+      orbitInclination,
+      payloadCapacity,
+      payloadAvailablity
+    );
+    setNewMissionOpen(false);
     try {
-      setMissions((await getMissions(sortField,sortDesc)).data.Missions);
+      setMissions((await getMissions(sortField, sortDesc)).data.Missions);
     } catch (error) {
       setErrMessage("Failed to load missions.");
-        console.log(error);
+      console.log(error);
     }
   };
   // const deleteMissions = async (id:String) => {
@@ -186,7 +208,7 @@ const Missions = (): JSX.Element => {
   //        console.log(error);
   //    }
   //  };
-    
+
   const handleErrClose = (event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") return;
     setErrMessage(null);
@@ -222,8 +244,6 @@ const Missions = (): JSX.Element => {
         console.log(err);
       });
   }, [sortField, sortDesc]);
-
-
 
   return (
     <AppLayout title="Missions">
@@ -264,7 +284,9 @@ const Missions = (): JSX.Element => {
                   </CardContent>
                   <CardActions>
                     <Button>Edit</Button>
-                    <Button onClick={(e)=> deleteMissions(missions.id)}>Delete</Button>
+                    <Button onClick={(e) => deleteMissions(missions.id)}>
+                      Delete
+                    </Button>
                   </CardActions>
                 </Card>
               </Grid>
@@ -356,22 +378,27 @@ const Missions = (): JSX.Element => {
                   id="desc"
                   type="number"
                   label="LocationLongitude"
-                  onChange={(e) => setLocationLongitude(parseInt(e.target.value) )}
+                  onChange={(e) =>
+                    setLocationLongitude(parseInt(e.target.value))
+                  }
                   variant="standard"
                   fullWidth
                 />
-              </Grid><Grid item>
-                
+              </Grid>
+              <Grid item>
                 <TextField
                   autoFocus
                   id="desc"
                   type="number"
                   label="LocationLatitude"
-                  onChange={(e) => setLocationLatitude(parseInt(e.target.value))}
+                  onChange={(e) =>
+                    setLocationLatitude(parseInt(e.target.value))
+                  }
                   variant="standard"
                   fullWidth
                 />
-              </Grid><Grid item>
+              </Grid>
+              <Grid item>
                 <TextField
                   autoFocus
                   id="desc"
@@ -399,7 +426,9 @@ const Missions = (): JSX.Element => {
                   id="desc"
                   type="number"
                   label="OrbitInclination"
-                  onChange={(e) => setOrbitInclination(parseInt(e.target.value))}
+                  onChange={(e) =>
+                    setOrbitInclination(parseInt(e.target.value))
+                  }
                   variant="standard"
                   fullWidth
                 />
@@ -421,7 +450,9 @@ const Missions = (): JSX.Element => {
                   id="desc"
                   type="number"
                   label="vehiPayloadAvailablitycle"
-                  onChange={(e) => setPayloadAvailablity(parseInt(e.target.value))}
+                  onChange={(e) =>
+                    setPayloadAvailablity(parseInt(e.target.value))
+                  }
                   variant="standard"
                   fullWidth
                 />
