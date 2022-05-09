@@ -94,8 +94,8 @@ const main = async () => {
           const missions = await loadMissions();
           const mission = await GetMissionById(missions, args.id);
           for (let index = 0; index < missions.length; index++) {
-            if(missions[index] === mission)
-              missions.splice(index,1)
+            if (missions[index] === mission)
+              missions.splice(index, 1)
           }
           // missions.filter((index) => index!== mission)
           await writeFile(
@@ -108,31 +108,30 @@ const main = async () => {
         async updateMission(obj, args) {
           const missions = await loadMissions();
           const mission = await GetMissionById(missions, args.id);
-          if(mission)
-          {
-          if(args.mission.operator)
-          mission.operator = args.mission.operator
-          if(args.mission.title )
-          mission.title = args.mission.title
-          if(args.mission.launch.date )
-          mission.launch.date = args.mission.launch.date
-          missions.push(mission);
-          await writeFile(
-            path.join(DATA_DIR, DATA_FILE_MISSIONS),
-            JSON.stringify(missions),
-            "utf8"
-          );
-          }        
+          if (mission) {
+            if (args.mission.operator)
+              mission.operator = args.mission.operator
+            if (args.mission.title)
+              mission.title = args.mission.title
+            if (args.mission.launch.date)
+              mission.launch.date = args.mission.launch.date
+            missions.push(mission);
+            await writeFile(
+              path.join(DATA_DIR, DATA_FILE_MISSIONS),
+              JSON.stringify(missions),
+              "utf8"
+            );
+          }
           return mission;
         },
-      
+
       },
     },
   });
 
-  app.get("/readme", 
-    async (req : Request, res: Response ) => {
-      const readme : String = await readFile(path.join(__dirname, "../../README.md"), "utf8")
+  app.get("/readme",
+    async (req: Request, res: Response) => {
+      const readme: String = await readFile(path.join(__dirname, "../../README.md"), "utf8")
       res.send(readme);
     }
   );

@@ -251,15 +251,15 @@ const Missions = (): JSX.Element => {
       console.log(error);
     }
   };
-  const deleteMissions = async (id:String) => {
+  const deleteMissions = async (id: String) => {
     await removeMission(id);
-     try {
-       setMissions((await getMissions(sortField,sortDesc)).data.Missions);
-     } catch (error) {
-       setErrMessage("Failed to load missions.");
-         console.log(error);
-     }
-   };
+    try {
+      setMissions((await getMissions(sortField, sortDesc)).data.Missions);
+    } catch (error) {
+      setErrMessage("Failed to load missions.");
+      console.log(error);
+    }
+  };
 
   const handleErrClose = (event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") return;
@@ -282,11 +282,11 @@ const Missions = (): JSX.Element => {
   const handleEditMissionClose = () => {
     setEditMissionOpen(false);
   };
-  const handleEditMissionId = (id:String) => {
+  const handleEditMissionId = (id: String) => {
     setEditMissionId(id);
     handleEditMissionOpen();
   };
-  
+
   const handleTempLaunchDateChange = (newValue: Date | null) => {
     setTempLaunchDate(newValue);
   };
@@ -349,9 +349,7 @@ const Missions = (): JSX.Element => {
                     <Typography noWrap>{missions.operator}</Typography>
                   </CardContent>
                   <CardActions>
-                    <Button
-                      onClick={(e)=> handleEditMissionId(missions.id)}
-                    >
+                    <Button onClick={(e) => handleEditMissionId(missions.id)}>
                       Edit
                     </Button>
                     <Button onClick={(e) => deleteMissions(missions.id)}>
@@ -587,7 +585,7 @@ const Missions = (): JSX.Element => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleEditMissionClose}>Cancel</Button>
-          <Button onClick={ ()=> editMission(editMissionId)}>Save</Button>
+          <Button onClick={() => editMission(editMissionId)}>Save</Button>
         </DialogActions>
       </Dialog>
 

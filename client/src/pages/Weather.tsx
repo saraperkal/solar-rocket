@@ -36,47 +36,57 @@ const Weather = (): JSX.Element => {
   };
 
   return (
-    <AppLayout title="Weather" >
-      <Grid container >    
+    <AppLayout title="Weather">
+      <Grid container>
         {content.map((index: any) => {
-          return (           
-              <Card sx={{ alignItems:"center",width: 1200, height: 500 }}>
-              <CardHeader title="Israel"  sx={{backgroundColor:"#e0e0e0"}}/>
-              <CardHeader title={index.date}  />
-                <TableContainer component={Paper}>
-                  <Table sx={{ minWidth: 700 }} aria-label="customized table" >
-                    <TableHead>
-                    <TableRow >
-                        <TableCell sx={{backgroundColor:"white"}}> </TableCell>
-                        {index.hour.map((hour: any) => {
-                          return <TableCell><img src={hour.condition.icon} /></TableCell>;
-                        })}
-                      </TableRow>
-                      <TableRow sx={{backgroundColor:"#80deea"}}>
-                        <TableCell sx={{backgroundColor:"white"}}> </TableCell>
-                        {index.hour.map((hour: any) => {
-                          return <TableCell>{hour.time.slice(10)}</TableCell>;
-                        })}
-                      </TableRow>
+          return (
+            <Card sx={{ alignItems: "center", width: 1200, height: 500 }}>
+              <CardHeader title="Israel" sx={{ backgroundColor: "#e0e0e0" }} />
+              <CardHeader title={index.date} />
+              <TableContainer component={Paper}>
+                <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ backgroundColor: "white" }}> </TableCell>
+                      {index.hour.map((hour: any) => {
+                        return (
+                          <TableCell>
+                            <img src={hour.condition.icon} />
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                    <TableRow sx={{ backgroundColor: "#80deea" }}>
+                      <TableCell sx={{ backgroundColor: "white" }}> </TableCell>
+                      {index.hour.map((hour: any) => {
+                        return <TableCell>{hour.time.slice(10)}</TableCell>;
+                      })}
+                    </TableRow>
 
-                      <TableRow sx={{backgroundColor:"#ffeb3b"}}>
-                      <TableCell sx={{backgroundColor:"white"}}> <Typography variant="h6" >c°</Typography></TableCell>
-                        {index.hour.map((hour: any) => {
-                          return <TableCell >{hour.temp_c}</TableCell>;
-                        })}
-                      </TableRow>
-                      <TableRow sx={{backgroundColor:"#ffeb3b"}}>
-                      <TableCell sx={{backgroundColor:"white"}}> <Typography variant="h6">f°</Typography></TableCell>
-                        {index.hour.map((hour: any) => {
-                          return <TableCell>{hour.temp_f}</TableCell>;
-                        })}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody></TableBody>
-                  </Table>
-                  <p></p>
-                </TableContainer>
-              </Card>
+                    <TableRow sx={{ backgroundColor: "#ffeb3b" }}>
+                      <TableCell sx={{ backgroundColor: "white" }}>
+                        {" "}
+                        <Typography variant="h6">c°</Typography>
+                      </TableCell>
+                      {index.hour.map((hour: any) => {
+                        return <TableCell>{hour.temp_c}</TableCell>;
+                      })}
+                    </TableRow>
+                    <TableRow sx={{ backgroundColor: "#ffeb3b" }}>
+                      <TableCell sx={{ backgroundColor: "white" }}>
+                        {" "}
+                        <Typography variant="h6">f°</Typography>
+                      </TableCell>
+                      {index.hour.map((hour: any) => {
+                        return <TableCell>{hour.temp_f}</TableCell>;
+                      })}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody></TableBody>
+                </Table>
+                <p></p>
+              </TableContainer>
+            </Card>
           );
         })}
       </Grid>
