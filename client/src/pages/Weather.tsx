@@ -21,7 +21,6 @@ import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 
 const Weather = (): JSX.Element => {
   const [content, setContent] = useState<Array<string>>([]);
-  
   useEffect(() => {
     setWeather();
   }, []);
@@ -37,11 +36,11 @@ const Weather = (): JSX.Element => {
   };
 
   return (
-    <AppLayout title="Weather">
+    <AppLayout title="Weather" >
       <Grid container >    
         {content.map((index: any) => {
           return (           
-              <Card sx={{ alignSelf:"center",width: 1200, height: 500 }}>
+              <Card sx={{ alignItems:"center",width: 1200, height: 500 }}>
               <CardHeader title="Israel"  sx={{backgroundColor:"#e0e0e0"}}/>
               <CardHeader title={index.date}  />
                 <TableContainer component={Paper}>

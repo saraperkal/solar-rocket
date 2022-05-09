@@ -77,7 +77,7 @@ const getMissions = async (
     { sortField: sortField, sortDesc: sortDesc }
   );
 };
-const deleteMissions = async (id: String): Promise<MissionsResponse> => {
+const removeMission = async (id: String): Promise<MissionsResponse> => {
   return await fetchGraphQL(
     `
     mutation ($id:ID!){
@@ -92,6 +92,41 @@ const deleteMissions = async (id: String): Promise<MissionsResponse> => {
       }
       `,
     { id: id }
+  );
+};
+const updateMission = async (
+  id: String,
+  title: String,
+  operator: String,
+  date: Date
+): Promise<MissionsResponse> => {
+  return await fetchGraphQL(
+    `
+    mutation updateMissiontry(
+      $id:ID!,
+      $title: String!,
+      $operator: String!,
+      $date:DateTime!) {
+      updateMission(
+        id:$id,
+        mission: {
+          title: $title, 
+          operator: $operator,
+          launch: {date: $date,vehicle: "aaa",location: {name: "sss",longitude: 1,latitude: 1}},
+          orbit:{periapsis:1,apoapsis:1,inclination:1},
+          payload:{capacity:1,available:1}
+        }) 
+        {
+        id
+        title
+        operator
+        launch {
+          date
+        }
+  }
+}
+      `,
+    { id: id, title: title, operator: operator, date: date }
   );
 };
 const addMission = async (
@@ -159,6 +194,7 @@ const addMission = async (
 const Missions = (): JSX.Element => {
   const [missions, setMissions] = useState<Mission[] | null>(null);
   const [newMissionOpen, setNewMissionOpen] = useState(false);
+  const [editMissionOpen, setEditMissionOpen] = useState(false);
   const [tempLaunchDate, setTempLaunchDate] = useState<Date | null>(null);
   const [launchDate, setLaunchDate] = useState<Date | null>(null);
   const [sortDesc, setSortDesc] = useState<boolean>(false);
@@ -175,24 +211,25 @@ const Missions = (): JSX.Element => {
   const [orbitInclination, setOrbitInclination] = useState<Number>(0);
   const [payloadCapacity, setPayloadCapacity] = useState<Number>(0);
   const [payloadAvailablity, setPayloadAvailablity] = useState<Number>(0);
+  const [editMissionId, setEditMissionId] = useState<String>("");
+  const [updatedMission, setUpdatedMission] = useState({});
 
   const newMission = async () => {
-    if(tempLaunchDate)
-    {
-    await addMission(
-      title,
-      operator,
-      tempLaunchDate,
-      vehicle,
-      locationName,
-      locationLongitude,
-      locationLatitude,
-      orbidPeriapsis,
-      orbidApoapsis,
-      orbitInclination,
-      payloadCapacity,
-      payloadAvailablity
-    );
+    if (tempLaunchDate) {
+      await addMission(
+        title,
+        operator,
+        tempLaunchDate,
+        vehicle,
+        locationName,
+        locationLongitude,
+        locationLatitude,
+        orbidPeriapsis,
+        orbidApoapsis,
+        orbitInclination,
+        payloadCapacity,
+        payloadAvailablity
+      );
     }
     setNewMissionOpen(false);
     try {
@@ -202,15 +239,27 @@ const Missions = (): JSX.Element => {
       console.log(error);
     }
   };
-  // const deleteMissions = async (id:String) => {
-  //   await deleteMission(id);
-  //    try {
-  //      setMissions((await getMissions(sortField,sortDesc)).data.Missions);
-  //    } catch (error) {
-  //      setErrMessage("Failed to load missions.");
-  //        console.log(error);
-  //    }
-  //  };
+  const editMission = async (id: String) => {
+    if (tempLaunchDate) {
+      await updateMission(id, title, operator, tempLaunchDate);
+    }
+    setEditMissionOpen(false);
+    try {
+      setMissions((await getMissions(sortField, sortDesc)).data.Missions);
+    } catch (error) {
+      setErrMessage("Failed to load missions.");
+      console.log(error);
+    }
+  };
+  const deleteMissions = async (id:String) => {
+    await removeMission(id);
+     try {
+       setMissions((await getMissions(sortField,sortDesc)).data.Missions);
+     } catch (error) {
+       setErrMessage("Failed to load missions.");
+         console.log(error);
+     }
+   };
 
   const handleErrClose = (event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") return;
@@ -225,7 +274,19 @@ const Missions = (): JSX.Element => {
   const handleNewMissionClose = () => {
     setNewMissionOpen(false);
   };
+  const handleEditMissionOpen = () => {
+    setTempLaunchDate(null);
+    setEditMissionOpen(true);
+  };
 
+  const handleEditMissionClose = () => {
+    setEditMissionOpen(false);
+  };
+  const handleEditMissionId = (id:String) => {
+    setEditMissionId(id);
+    handleEditMissionOpen();
+  };
+  
   const handleTempLaunchDateChange = (newValue: Date | null) => {
     setTempLaunchDate(newValue);
   };
@@ -288,7 +349,11 @@ const Missions = (): JSX.Element => {
                     <Typography noWrap>{missions.operator}</Typography>
                   </CardContent>
                   <CardActions>
-                    <Button>Edit</Button>
+                    <Button
+                      onClick={(e)=> handleEditMissionId(missions.id)}
+                    >
+                      Edit
+                    </Button>
                     <Button onClick={(e) => deleteMissions(missions.id)}>
                       Delete
                     </Button>
@@ -319,6 +384,8 @@ const Missions = (): JSX.Element => {
           fullWidth
           maxWidth="sm"
         >
+          {/* </Dialog> */}
+
           <DialogTitle>New Mission</DialogTitle>
           <DialogContent>
             <Grid container direction="column" spacing={2}>
@@ -471,6 +538,59 @@ const Missions = (): JSX.Element => {
           </DialogActions>
         </Dialog>
       </Container>
+      <Dialog
+        open={editMissionOpen}
+        onClose={handleNewMissionClose}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Edit Mission</DialogTitle>
+        <DialogContent>
+          <Grid container direction="column" spacing={2}>
+            <Grid item>
+              <TextField
+                autoFocus
+                id="name"
+                label="Title"
+                onChange={(e) => setTitle(e.target.value)}
+                variant="standard"
+                fullWidth
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                autoFocus
+                id="desc"
+                label="Operator"
+                onChange={(e) => setOperator(e.target.value)}
+                variant="standard"
+                fullWidth
+              />
+            </Grid>
+
+            <Grid item>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DateTimePicker
+                  minDate={new Date()}
+                  minTime={new Date()}
+                  label="Launch Date"
+                  value={launchDate}
+                  onChange={handleTempLaunchDateChange}
+                  onAccept={handleLaunchDateChange}
+                  renderInput={(params) => (
+                    <TextField variant="standard" {...params} />
+                  )}
+                />
+              </LocalizationProvider>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditMissionClose}>Cancel</Button>
+          <Button onClick={ ()=> editMission(editMissionId)}>Save</Button>
+        </DialogActions>
+      </Dialog>
+
       <Snackbar
         open={errMessage != null}
         autoHideDuration={5000}
