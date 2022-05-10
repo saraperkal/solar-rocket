@@ -25,6 +25,7 @@ import {
   Alert,
   Box,
   CircularProgress,
+  DialogContentText,
 } from "@mui/material";
 
 import {
@@ -213,8 +214,12 @@ const Missions = (): JSX.Element => {
   const [payloadAvailablity, setPayloadAvailablity] = useState<Number>(0);
   const [editMissionId, setEditMissionId] = useState<String>("");
   const [updatedMission, setUpdatedMission] = useState({});
+  const [openAlert, setOpenAlert] = useState<boolean>(false);
+  const [id, setId] = useState<String>("");
+
 
   const newMission = async () => {
+    handleCloseAlert();
     if (tempLaunchDate) {
       await addMission(
         title,
@@ -252,6 +257,7 @@ const Missions = (): JSX.Element => {
     }
   };
   const deleteMissions = async (id: String) => {
+    handleCloseAlert()
     await removeMission(id);
     try {
       setMissions((await getMissions(sortField, sortDesc)).data.Missions);
@@ -298,6 +304,14 @@ const Missions = (): JSX.Element => {
   };
   const handleSortDescClick = () => {
     setSortDesc(!sortDesc);
+  };
+  const handleClickOpenAlert = (id:String) => {
+    setId(id)
+    setOpenAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
   };
 
   useEffect(() => {
@@ -352,7 +366,7 @@ const Missions = (): JSX.Element => {
                     <Button onClick={(e) => handleEditMissionId(missions.id)}>
                       Edit
                     </Button>
-                    <Button onClick={(e) => deleteMissions(missions.id)}>
+                    <Button onClick={(e) => handleClickOpenAlert(missions.id)}>
                       Delete
                     </Button>
                   </CardActions>
@@ -536,12 +550,32 @@ const Missions = (): JSX.Element => {
           </DialogActions>
         </Dialog>
       </Container>
+      <div>
+      
+      <Dialog
+        open={openAlert}
+        onClose={handleCloseAlert}
+      >
+        <DialogTitle id="alert-dialog-title">
+        Are you sure you want to delete this Missiom?
+        </DialogTitle>
+        <DialogContent>       
+        </DialogContent>
+        <DialogActions>
+        <Button onClick={(e) => deleteMissions(id)} autoFocus>
+            yes
+          </Button>
+          <Button onClick={handleCloseAlert}>no</Button>         
+        </DialogActions>
+      </Dialog>
+    </div>
       <Dialog
         open={editMissionOpen}
         onClose={handleNewMissionClose}
         fullWidth
         maxWidth="sm"
       >
+        
         <DialogTitle>Edit Mission</DialogTitle>
         <DialogContent>
           <Grid container direction="column" spacing={2}>
