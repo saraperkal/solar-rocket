@@ -92,18 +92,15 @@ const main = async () => {
         },
         async deleteMission(obj, args) {
           const missions = await loadMissions();
-          const mission = await GetMissionById(missions, args.id);
-          for (let index = 0; index < missions.length; index++) {
-            if (missions[index] === mission)
-              missions.splice(index, 1)
-          }
+          const mission = await GetMissionById(missions, args.id);       
+          missions.splice(missions.indexOf(args.id),1)
           // missions.filter((index) => index!== mission)
           await writeFile(
             path.join(DATA_DIR, DATA_FILE_MISSIONS),
             JSON.stringify(missions),
             "utf8"
           );
-          return missions;
+          return mission;
         },
         async updateMission(obj, args) {
           const missions = await loadMissions();
